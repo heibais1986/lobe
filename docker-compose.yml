@@ -1,0 +1,21 @@
+version: '3.8'
+name: lobechat
+services:
+  lobe:
+    container_name: lobe-chat
+    app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7860:3010"
+    environment:
+
+      # --- 新增 Google Gemini 的配置 ---
+      GOOGLE_API_KEY: AIzaSyBMV6n5GEF44HEvWXSeYJochDG1JFR6xNE
+
+      # 可选：如果你在中国大陆或其他需要代理的地区，可以设置代理
+      # GOOGLE_PROXY_URL: https://your.proxy.url/v1beta
+    volumes:
+      - ~/.lobechat:/app/data
+    restart: always
