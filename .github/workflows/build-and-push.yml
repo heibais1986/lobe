@@ -1,0 +1,41 @@
+name: Build and Push LobeChat to Docker Hub
+
+# 触发条件：当有代码推送到 main 分支时自动运行
+on:
+  push:
+    branches: [ "main" ] # 你可以修改为你的主分支名，比如 master
+
+jobs:
+  build-and-push:
+    # 使用最新的 Ubuntu 运行环境
+    runs-on: ubuntu-latest
+
+    steps:
+      # 第一步：检出你的代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 第二步：设置 Docker Buildx，这是一个高级的构建器
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 第三步：登录到 Docker Hub
+      # 这里使用了我们之前设置的 Secrets
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 第四步：构建并推送 Docker 镜像
+      # 这是最关键的一步
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: anchorlau/lobe-chat:latest, anchorlau/lobe-chat:${{ github.sha }}
+          # 开启构建缓存，加速后续构建
+          cache-from: type=registry,ref=anchorlau/lobe-chat:buildcache
+          cache-to: type=registry,ref=anchorlau/lobe-chat:buildcache,mode=max
