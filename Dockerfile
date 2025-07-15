@@ -14,6 +14,8 @@ RUN npm install -g pnpm
 
 # 复制依赖定义文件
 COPY package.json pnpm-workspace.yaml ./
+COPY .npmrc ./
+COPY packages ./packages
 
 # 安装项目依赖
 RUN pnpm install
