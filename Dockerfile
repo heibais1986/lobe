@@ -23,7 +23,7 @@ RUN pnpm install
 COPY . .
 
 # 构建 LobeChat 应用
-RUN pnpm build
+RUN NODE_OPTIONS="--max-old-space-size=6144" pnpm build
 
 # 暴露 LobeChat 的运行端口
 EXPOSE 3010
