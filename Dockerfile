@@ -55,6 +55,6 @@ EXPOSE 3010
 
 # 定义容器启动时运行的命令
 # 在生产环境中，我们使用 `next start` 而不是 `pnpm start`，这更标准且高效
-CMD [ "npx", "next", "start", "-p", "3010" ]
+CMD ["node", "/app/node_modules/.bin/next", "start", "-p", "3010"]
 
 
