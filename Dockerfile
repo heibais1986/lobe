@@ -49,8 +49,6 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json 
 COPY --from=builder /app/public ./public
-# The 'standalone' folder is often created by `next build` for optimized deployment
-COPY --from=builder /app/standalone ./standalone
 
 # [关键变更] 暴露项目 'start' 脚本中定义的正确端口
 # The package.json specifies port 3210.
