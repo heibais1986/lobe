@@ -34,7 +34,7 @@ WORKDIR /app
 
 # 再次安装系统依赖，但这次只需要运行时的，而不是构建时的
 # 对于 LobeChat，@napi-rs/canvas 在运行时也需要 cairo 等库
-RUN apk add --no-cache libcairo2-dev jpeg-dev pango-dev giflib-dev librsvg-dev
+# RUN apk add --no-cache libcairo2-dev jpeg-dev pango-dev giflib-dev librsvg-dev
 
 # 从构建器阶段复制必要的产物
 COPY --from=builder /app/.next ./.next
