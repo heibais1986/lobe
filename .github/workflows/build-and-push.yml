@@ -31,6 +31,9 @@ jobs:
       # 这是最关键的一步
       - name: Build and push
         uses: docker/build-push-action@v5
+        env:
+          # 设置 Node.js 的内存上限为 6GB
+          NODE_OPTIONS: "--max-old-space-size=6144"
         with:
           context: .
           file: ./Dockerfile
