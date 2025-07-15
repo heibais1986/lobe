@@ -1,59 +1,64 @@
-# --- The Definitive Dockerfile for LobeChat on GitHub Actions ---
+# --- Final Optimized Dockerfile for LobeChat (v8 - The Official Method) ---
 
-# 使用一个包含 Node.js v18 和必要构建工具的基础镜像
+# --- STAGE 1: The Builder ---
+# This stage builds the application using the official project scripts.
 FROM node:18-alpine AS builder
 
-# 设置工作目录
+# Set work directory
 WORKDIR /app
 
-# 安装系统依赖，这是构建 @napi-rs/canvas 所必需的
+# Install system dependencies needed for build and runtime
 RUN apk add --no-cache bash cairo-dev jpeg-dev pango-dev giflib-dev librsvg-dev curl unzip
 
-# 安装 pnpm
+# Install pnpm package manager (as specified in package.json)
+# LobeChat uses pnpm, so we use pnpm
 RUN npm install -g pnpm
 
-# [FIX] Install the bun runtime, which is now a build dependency
+# Install the bun runtime (some scripts use it, e.g., db:migrate)
 RUN curl -fsSL https://bun.sh/install | bash
- 
-# [FIX] Add bun to the system's PATH so it can be found by subsequent commands
 ENV PATH="/root/.bun/bin:${PATH}"
 
-# 复制依赖定义文件
+# Copy dependency definition files
 COPY package.json pnpm-workspace.yaml ./
 COPY .npmrc ./
 COPY packages ./packages
 
-# 安装项目依赖
+# Install project dependencies with pnpm
 RUN pnpm install
 
-# 复制所有源代码
+# Copy all the application source code
 COPY . .
 
-# [★★★ 核心修复点 ★★★]
-# 在执行构建命令时，直接为其注入 NODE_OPTIONS 环境变量。
-# 这会强制 pnpm build (即 next build) 使用最高 6GB 的内存。
-RUN NODE_OPTIONS="--max-old-space-size=6144" pnpm build
+# [关键变更] 使用官方指定的 Docker 构建脚本
+# This is the correct, official way to build the project for Docker deployment.
+# It handles pre-build steps and sets necessary environment variables.
+RUN NODE_OPTIONS="--max-old-space-size=6144" pnpm run build:docker
 
-# --- 生产镜像 ---
-# 使用一个更轻量的基础镜像来运行应用，减小最终镜像体积
+# --- STAGE 2: The Production Image ---
+# This stage creates the final, lightweight image for running the app.
 FROM node:18-alpine
 
 WORKDIR /app
 
-# 再次安装系统依赖，但这次只需要运行时的，而不是构建时的
-# 对于 LobeChat，@napi-rs/canvas 在运行时也需要 cairo 等库
+# Install only the RUNTIME system dependencies.
+# This makes the final image smaller and more secure.
 RUN apk add --no-cache cairo-dev jpeg-dev pango-dev giflib-dev librsvg-dev
 
-# 从构建器阶段复制必要的产物
+# Copy built assets and necessary files from the 'builder' stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package.json ./package.json 
 COPY --from=builder /app/public ./public
+# The 'standalone' folder is often created by `next build` for optimized deployment
+COPY --from=builder /app/standalone ./standalone
 
-# 暴露 LobeChat 的运行端口
-EXPOSE 3010
+# [关键变更] 暴露项目 'start' 脚本中定义的正确端口
+# The package.json specifies port 3210.
+EXPOSE 3210
 
-# 定义容器启动时运行的命令
-# 在生产环境中，我们使用 `next start` 而不是 `pnpm start`，这更标准且高效
-CMD ["/app/node_modules/.bin/next", "start", "-p", "3010"]
+# [最终命令] 使用 npm start
+# This is the canonical way to run a Node.js app.
+# It will execute the "start": "next start -p 3210" script from package.json.
+# npm automatically ensures the correct Node.js version and paths are used.
+CMD ["npm", "start"]
 
