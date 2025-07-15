@@ -6,7 +6,7 @@ WORKDIR /app
 
 # [关键步骤] 安装系统依赖，为 @napi-rs/canvas 做准备
 # 这里我们用 'apk' 是因为 'node:18-alpine' 这个基础镜像是基于 Alpine Linux 的
-RUN apk add --no-cache libcairo2-dev jpeg-dev pango-dev giflib-dev librsvg-dev
+# RUN apk add --no-cache libcairo2-dev jpeg-dev pango-dev giflib-dev librsvg-dev
 
 # 安装 pnpm 包管理器
 RUN npm install -g pnpm
