@@ -7,7 +7,7 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 
 # 安装系统依赖，这是构建 @napi-rs/canvas 所必需的
-RUN apk add --no-cache cairo-dev jpeg-dev pango-dev giflib-dev librsvg-dev curl unzip
+RUN apk add --no-cache bash cairo-dev jpeg-dev pango-dev giflib-dev librsvg-dev curl unzip
 
 # 安装 pnpm
 RUN npm install -g pnpm
