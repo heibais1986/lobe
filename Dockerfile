@@ -13,7 +13,7 @@ RUN apk add --no-cache libcairo2-dev jpeg-dev pango-dev giflib-dev librsvg-dev
 RUN npm install -g pnpm
 
 # 复制依赖定义文件
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-workspace.yaml ./
 
 # 安装项目依赖
 RUN pnpm install
