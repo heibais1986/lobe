@@ -12,6 +12,12 @@ WORKDIR /app
 # 安装 pnpm
 RUN npm install -g pnpm
 
+# [FIX] Install the bun runtime, which is now a build dependency
+RUN curl -fsSL https://bun.sh/install | bash
+ 
+# [FIX] Add bun to the system's PATH so it can be found by subsequent commands
+ENV PATH="/root/.bun/bin:${PATH}"
+
 # 复制依赖定义文件
 COPY package.json pnpm-workspace.yaml ./
 COPY .npmrc ./
